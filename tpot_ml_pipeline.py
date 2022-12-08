@@ -1,7 +1,7 @@
 import numpy as np
 import pandas as pd
 from sklearn.ensemble import RandomForestRegressor
-from sklearn.linear_model import ElasticNetCV, SGDRegressor
+from sklearn.linear_model import ElasticNetCV
 from sklearn.model_selection import train_test_split
 from sklearn.pipeline import make_pipeline, make_union
 from tpot.builtins import StackingEstimator
@@ -13,11 +13,10 @@ features = tpot_data.drop('target', axis=1)
 training_features, testing_features, training_target, testing_target = \
             train_test_split(features, tpot_data['target'], random_state=42)
 
-# Average CV score on the training set was: -307.19222912682227
+# Average CV score on the training set was: -303.38237636728564
 exported_pipeline = make_pipeline(
-    StackingEstimator(estimator=ElasticNetCV(l1_ratio=0.75, tol=0.01)),
-    StackingEstimator(estimator=SGDRegressor(alpha=0.001, eta0=0.01, fit_intercept=False, l1_ratio=0.25, learning_rate="invscaling", loss="squared_loss", penalty="elasticnet", power_t=100.0)),
-    RandomForestRegressor(bootstrap=True, max_features=0.4, min_samples_leaf=16, min_samples_split=14, n_estimators=100)
+    StackingEstimator(estimator=RandomForestRegressor(bootstrap=True, max_features=0.1, min_samples_leaf=19, min_samples_split=19, n_estimators=100)),
+    ElasticNetCV(l1_ratio=1.0, tol=0.1)
 )
 # Fix random state for all the steps in exported pipeline
 set_param_recursive(exported_pipeline.steps, 'random_state', 42)
